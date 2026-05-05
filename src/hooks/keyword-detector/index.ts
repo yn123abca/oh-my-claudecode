@@ -1,8 +1,11 @@
 /**
  * Keyword Detector Hook
  *
- * Detects magic keywords in user prompts and returns the appropriate
+ * Detects workflow keywords in user prompts and returns the appropriate
  * mode message to inject into context.
+ *
+ * Runtime workflows must not start from task class alone or from bare runtime
+ * keywords; they require explicit runtime invocation context.
  *
  * Ported from oh-my-opencode's keyword-detector hook.
  */

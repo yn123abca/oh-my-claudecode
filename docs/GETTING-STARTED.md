@@ -381,7 +381,7 @@ You can change keywords in four categories via the `magicKeywords` section of `c
 }
 ```
 
-> ℹ️ **Note:** The `magicKeywords` section in `config.jsonc` only allows customizing four categories: `ultrawork`, `search`, `analyze`, and `ultrathink`. Keywords such as `autopilot`, `ralph`, and `ccg` are hardcoded in the keyword-detector hook and cannot be changed via config files.
+> ℹ️ **Note:** The `magicKeywords` section in `config.jsonc` only allows customizing four categories: `ultrawork`, `search`, `analyze`, and `ultrathink`. Runtime workflows such as `autopilot` and `ralph` are gated by explicit runtime invocation context and are not configurable bare keyword triggers.
 
 ### Model routing configuration
 

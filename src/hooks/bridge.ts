@@ -1332,8 +1332,10 @@ async function seedModeStateForExplicitWorkflowSlash(
 
 /**
  * Process keyword detection hook
- * Detects magic keywords and returns injection message
- * Also activates persistent state for modes that require it (ralph, ultrawork)
+ * Detects workflow keywords and returns injection message.
+ * Runtime modes activate only from explicit invocation context; they must not
+ * start from task class alone or from bare runtime keywords.
+ * Also activates persistent state for modes that require it after activation.
  */
 async function processKeywordDetector(input: HookInput): Promise<HookOutput> {
   // Team worker guard: prevent keyword detection inside team workers to avoid
