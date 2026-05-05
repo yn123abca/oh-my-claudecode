@@ -38,10 +38,10 @@
 
 **ステップ 3: 何か作ってみる**
 ```
-autopilot: build a REST API for managing tasks
+/autopilot "build a REST API for managing tasks"
 ```
 
-以上です。あとは自動で進みます。
+以上です。デフォルト経路は direct 実行のままであり、runtime ワークフローは `/autopilot`、`/ralph`、`/ultrawork`、`omc ...` を明示的に呼び出すか、OMC runtime の使用を明示的に求めた場合にのみ開始されます。
 
 ### 何から始めればいいかわからない？
 
@@ -219,9 +219,9 @@ server.py:42 のハンドラーを try/except ClientDisconnectedError で囲ん�
 | `team` | 標準 Team オーケストレーション | `/team 3:executor "fix all TypeScript errors"` |
 | `omc-teams` | tmux CLI ワーカー (codex/gemini/claude) | `/omc-teams 2:codex "security review"` |
 | `ccg` | トライモデル Codex+Gemini オーケストレーション | `/ccg review this PR` |
-| `autopilot` | 完全自律実行 | `autopilot: build a todo app` |
-| `ralph` | 粘り強いモード | `ralph: refactor auth` |
-| `ulw` | 最大並列化 | `ulw fix all errors` |
+| `/autopilot` | 完全自律実行 | `/autopilot "build a todo app"` |
+| `/ralph` | 粘り強いモード | `/ralph "refactor auth"` |
+| `/ulw` | 最大並列化 | `/ultrawork "fix all errors"` |
 | `plan` | 計画インタビュー | `plan the API` |
 | `ralplan` | 反復的計画合意形成 | `ralplan this feature` |
 | `deep-interview` | ソクラテス式の要件明確化 | `deep-interview "vague idea"` |
@@ -229,7 +229,8 @@ server.py:42 のハンドラーを try/except ClientDisconnectedError で囲ん�
 | `ultrapilot` | **非推奨** — 代わりに `team` を使用 | `ultrapilot: build a fullstack app` |
 
 **注意:**
-- **ralph は ultrawork を含む:** ralph モードを有効にすると、ultrawork の並列実行が自動的に含まれます。キーワードを組み合わせる必要はありません。
+- **ralph は ultrawork を含む:** ralph runtime を明示的に有効にすると、ultrawork の並列実行が自動的に含まれます。
+- `quick`、`standard`、`deep` はすべてデフォルトで direct 実行です。`deep` 分類だけでは OMC は自動起動しません。
 - `swarm N agents` 構文はエージェント数抽出のために引き続き認識されますが、v4.1.7+ ではランタイムは Team ベースです。
 
 ---

@@ -39,10 +39,10 @@ OMC'yi `omc --plugin-dir <path>` veya `claude --plugin-dir <path>` aracılığı
 **Adım 3: Bir şey oluşturun**
 
 ```
-autopilot: build a REST API for managing tasks
+/autopilot "build a REST API for managing tasks"
 ```
 
-Bu kadar. Geri kalan her şey otomatik.
+Bu kadar. Varsayılan yol doğrudan yürütmedir; runtime iş akışları yalnızca `/autopilot`, `/ralph`, `/ultrawork`, `omc ...` açıkça çağrıldığında veya OMC runtime kullanımı açıkça istendiğinde başlar.
 
 ## Team Mode (Önerilen)
 
@@ -181,9 +181,9 @@ server.py:42'deki handler'ı try/except ClientDisconnectedError ile sarın...
 | Anahtar Kelime | Etki                                     | Örnek                                                           |
 | -------------- | ---------------------------------------- | --------------------------------------------------------------- |
 | `team`         | Kanonik Team orkestrasyonu               | `/oh-my-claudecode:team 3:executor "fix all TypeScript errors"` |
-| `autopilot`    | Tam otonom yürütme                       | `autopilot: build a todo app`                                   |
-| `ralph`        | Kalıcılık modu                           | `ralph: refactor auth`                                          |
-| `ulw`          | Maksimum paralellik                      | `ulw fix all errors`                                            |
+| `/autopilot`    | Tam otonom yürütme                       | `/autopilot "build a todo app"`                                   |
+| `/ralph`        | Kalıcılık modu                           | `/ralph "refactor auth"`                                          |
+| `/ulw`          | Maksimum paralellik                      | `/ultrawork "fix all errors"`                                            |
 | `eco`          | Token-verimli yürütme                    | `eco: migrate database`                                         |
 | `plan`         | Planlama mülakatı                        | `plan the API`                                                  |
 | `ralplan`      | Yinelemeli planlama uzlaşısı             | `ralplan this feature`                                          |
@@ -192,7 +192,8 @@ server.py:42'deki handler'ı try/except ClientDisconnectedError ile sarın...
 
 **Notlar:**
 
-- **ralph, ultrawork'ü içerir**: ralph modunu etkinleştirdiğinizde, ultrawork'ün paralel yürütmesini otomatik olarak içerir.
+- **ralph, ultrawork'ü içerir**: ralph runtime'ını açıkça etkinleştirdiğinizde, ultrawork'ün paralel yürütmesini otomatik olarak içerir.
+- `quick`, `standard` ve `deep` varsayılan olarak doğrudan yürütme kullanır. `deep` sınıflandırması tek başına OMC'yi otomatik başlatmaz.
 - `swarm N agents` sözdizimi hâlâ ajan sayısı çıkarımı için tanınmaktadır, ancak çalışma zamanı v4.1.7+'da Team tabanlıdır.
 
 ## Yardımcı Araçlar

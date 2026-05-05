@@ -38,10 +38,10 @@ Se você executar OMC via `omc --plugin-dir <path>` ou `claude --plugin-dir <pat
 
 **Passo 3: Crie algo**
 ```
-autopilot: build a REST API for managing tasks
+/autopilot "build a REST API for managing tasks"
 ```
 
-É isso. Todo o resto é automático.
+É isso. O caminho padrão continua sendo execução direta; workflows de runtime só iniciam quando você invoca explicitamente `/autopilot`, `/ralph`, `/ultrawork`, `omc ...` ou pede explicitamente para usar o runtime do OMC.
 
 ### Não sabe por onde começar?
 
@@ -219,9 +219,9 @@ Atalhos opcionais para usuários avançados. Linguagem natural funciona bem sem 
 | `team` | Orquestração canônica com Team | `/team 3:executor "fix all TypeScript errors"` |
 | `omc-teams` | Trabalhadores CLI tmux (codex/gemini/claude) | `/omc-teams 2:codex "security review"` |
 | `ccg` | Orquestação tri-modelo Codex+Gemini | `/ccg review this PR` |
-| `autopilot` | Execução autônoma completa | `autopilot: build a todo app` |
-| `ralph` | Modo persistente | `ralph: refactor auth` |
-| `ulw` | Paralelismo máximo | `ulw fix all errors` |
+| `/autopilot` | Execução autônoma completa | `/autopilot "build a todo app"` |
+| `/ralph` | Modo persistente | `/ralph "refactor auth"` |
+| `/ulw` | Paralelismo máximo | `/ultrawork "fix all errors"` |
 | `plan` | Entrevista de planejamento | `plan the API` |
 | `ralplan` | Consenso de planejamento iterativo | `ralplan this feature` |
 | `deep-interview` | Esclarecimento socrático de requisitos | `deep-interview "vague idea"` |
@@ -229,7 +229,8 @@ Atalhos opcionais para usuários avançados. Linguagem natural funciona bem sem 
 | `ultrapilot` | **Descontinuado** — use `team` em vez disso | `ultrapilot: build a fullstack app` |
 
 **Notas:**
-- **ralph inclui ultrawork**: quando você ativa o modo ralph, ele inclui automaticamente a execução paralela do ultrawork.
+- **ralph inclui ultrawork**: quando você ativa explicitamente o runtime ralph, ele inclui automaticamente a execução paralela do ultrawork.
+- `quick`, `standard` e `deep` usam execução direta por padrão. A classificação `deep` não inicia o OMC automaticamente.
 - A sintaxe `swarm N agents` ainda é reconhecida para extração da contagem de agentes, mas o runtime é baseado em Team na v4.1.7+.
 
 ## Utilitários

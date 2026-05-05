@@ -39,10 +39,10 @@ Si vous exécutez OMC via `omc --plugin-dir <path>` ou `claude --plugin-dir <pat
 **Étape 3 : Construisez quelque chose**
 
 ```
-autopilot: build a REST API for managing tasks
+/autopilot "build a REST API for managing tasks"
 ```
 
-C'est tout. Le reste est automatique.
+C'est tout. Le chemin par défaut reste l'exécution directe ; les workflows runtime ne démarrent que lorsque vous invoquez explicitement `/autopilot`, `/ralph`, `/ultrawork`, `omc ...` ou demandez explicitement d'utiliser le runtime OMC.
 
 ## Team Mode (Recommandé)
 
@@ -181,9 +181,9 @@ Raccourcis optionnels pour les utilisateurs avancés. Le langage naturel fonctio
 | Mot-clé      | Effet                               | Exemple                                                         |
 | ------------ | ----------------------------------- | --------------------------------------------------------------- |
 | `team`       | Orchestration Team canonique        | `/oh-my-claudecode:team 3:executor "fix all TypeScript errors"` |
-| `autopilot`  | Exécution entièrement autonome      | `autopilot: build a todo app`                                   |
-| `ralph`      | Mode persistant                     | `ralph: refactor auth`                                          |
-| `ulw`        | Parallélisme maximal                | `ulw fix all errors`                                            |
+| `/autopilot`  | Exécution entièrement autonome      | `/autopilot "build a todo app"`                                   |
+| `/ralph`      | Mode persistant                     | `/ralph "refactor auth"`                                          |
+| `/ulw`        | Parallélisme maximal                | `/ultrawork "fix all errors"`                                            |
 | `eco`        | Exécution économe en tokens         | `eco: migrate database`                                         |
 | `plan`       | Entretien de planification          | `plan the API`                                                  |
 | `ralplan`    | Consensus de planification itératif | `ralplan this feature`                                          |
@@ -192,7 +192,8 @@ Raccourcis optionnels pour les utilisateurs avancés. Le langage naturel fonctio
 
 **Notes :**
 
-- **ralph inclut ultrawork** : lorsque vous activez le mode ralph, il inclut automatiquement l'exécution parallèle d'ultrawork.
+- **ralph inclut ultrawork** : lorsque vous activez explicitement le runtime ralph, il inclut automatiquement l'exécution parallèle d'ultrawork.
+- `quick`, `standard` et `deep` utilisent l'exécution directe par défaut. La classification `deep` ne démarre pas OMC automatiquement.
 - La syntaxe `swarm N agents` est toujours reconnue pour l'extraction du nombre d'agents, mais le runtime est basé sur Team dans v4.1.7+.
 
 ## Utilitaires

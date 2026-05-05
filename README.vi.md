@@ -38,10 +38,10 @@ Nếu bạn chạy OMC qua `omc --plugin-dir <path>` hoặc `claude --plugin-dir
 
 **Bước 3: Xây một thứ gì đó**
 ```
-autopilot: build a REST API for managing tasks
+/autopilot "build a REST API for managing tasks"
 ```
 
-Vậy là xong. Mọi thứ còn lại đều tự động.
+Vậy là xong. Đường đi mặc định vẫn là thực thi direct; workflow runtime chỉ khởi động khi bạn gọi rõ ràng `/autopilot`, `/ralph`, `/ultrawork`, `omc ...` hoặc yêu cầu rõ ràng sử dụng OMC runtime.
 
 ### Chưa biết bắt đầu từ đâu?
 
@@ -219,9 +219,9 @@ Các phím tắt tùy chọn cho người dùng nâng cao. Không dùng chúng t
 | `team` | Điều phối Team chuẩn | `/team 3:executor "fix all TypeScript errors"` |
 | `omc-teams` | Công nhân CLI tmux (codex/gemini/claude) | `/omc-teams 2:codex "security review"` |
 | `ccg` | Điều phối tri-model Codex+Gemini | `/ccg review this PR` |
-| `autopilot` | Thực thi tự động toàn phần | `autopilot: build a todo app` |
-| `ralph` | Chế độ bền bỉ | `ralph: refactor auth` |
-| `ulw` | Song song tối đa | `ulw fix all errors` |
+| `/autopilot` | Thực thi tự động toàn phần | `/autopilot "build a todo app"` |
+| `/ralph` | Chế độ bền bỉ | `/ralph "refactor auth"` |
+| `/ulw` | Song song tối đa | `/ultrawork "fix all errors"` |
 | `plan` | Phỏng vấn lập kế hoạch | `plan the API` |
 | `ralplan` | Đồng thuận lập kế hoạch lặp | `ralplan this feature` |
 | `deep-interview` | Làm rõ yêu cầu theo phương pháp Socratic | `deep-interview "vague idea"` |
@@ -229,7 +229,8 @@ Các phím tắt tùy chọn cho người dùng nâng cao. Không dùng chúng t
 | `ultrapilot` | **Không còn khuyến nghị** — dùng `team` thay thế | `ultrapilot: build a fullstack app` |
 
 **Ghi chú:**
-- **ralph bao gồm ultrawork**: khi bạn kích hoạt chế độ ralph, nó tự động bao gồm thực thi song song của ultrawork.
+- **ralph bao gồm ultrawork**: khi bạn kích hoạt rõ ràng ralph runtime, nó tự động bao gồm thực thi song song của ultrawork.
+- `quick`, `standard`, `deep` đều mặc định dùng thực thi direct. Chỉ riêng phân loại `deep` không tự động khởi động OMC.
 - Cú pháp `swarm N agents` vẫn được nhận diện để trích xuất số lượng tác tử, nhưng runtime ở v4.1.7+ được hỗ trợ bởi Team.
 
 ## Tiện ích

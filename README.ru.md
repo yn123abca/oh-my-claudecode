@@ -39,10 +39,10 @@ _Не изучайте Claude Code. Просто используйте OMC._
 **Шаг 3: Создайте что-нибудь**
 
 ```
-autopilot: build a REST API for managing tasks
+/autopilot "build a REST API for managing tasks"
 ```
 
-Вот и всё. Всё остальное происходит автоматически.
+Вот и всё. Путь по умолчанию остаётся прямым выполнением; runtime-workflows запускаются только если вы явно вызываете `/autopilot`, `/ralph`, `/ultrawork`, `omc ...` или явно просите использовать runtime OMC.
 
 ## Team Mode (Рекомендуется)
 
@@ -181,9 +181,9 @@ source: extracted
 | Ключевое слово | Эффект                                          | Пример                                                          |
 | -------------- | ----------------------------------------------- | --------------------------------------------------------------- |
 | `team`         | Каноническая Team-оркестрация                   | `/oh-my-claudecode:team 3:executor "fix all TypeScript errors"` |
-| `autopilot`    | Полностью автономное выполнение                 | `autopilot: build a todo app`                                   |
-| `ralph`        | Режим настойчивости                             | `ralph: refactor auth`                                          |
-| `ulw`          | Максимальный параллелизм                        | `ulw fix all errors`                                            |
+| `/autopilot`    | Полностью автономное выполнение                 | `/autopilot "build a todo app"`                                   |
+| `/ralph`        | Режим настойчивости                             | `/ralph "refactor auth"`                                          |
+| `/ulw`          | Максимальный параллелизм                        | `/ultrawork "fix all errors"`                                            |
 | `eco`          | Токен-эффективное выполнение                    | `eco: migrate database`                                         |
 | `plan`         | Интервью для планирования                       | `plan the API`                                                  |
 | `ralplan`      | Итеративный консенсус планирования              | `ralplan this feature`                                          |
@@ -192,7 +192,8 @@ source: extracted
 
 **Примечания:**
 
-- **ralph включает ultrawork**: при активации ralph mode автоматически включается параллельное выполнение ultrawork.
+- **ralph включает ultrawork**: при явной активации ralph runtime автоматически включается параллельное выполнение ultrawork.
+- `quick`, `standard` и `deep` по умолчанию используют прямое выполнение. Классификация `deep` сама по себе не запускает OMC автоматически.
 - Синтаксис `swarm N agents` по-прежнему распознаётся для определения количества агентов, но в v4.1.7+ среда выполнения основана на Team.
 
 ## Утилиты
