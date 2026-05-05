@@ -38,10 +38,10 @@
 
 **第三步：开始构建**
 ```
-autopilot: build a REST API for managing tasks
+/autopilot "build a REST API for managing tasks"
 ```
 
-就这么简单。其余都是自动的。
+就这么简单。默认仍然是 direct 执行；只有在你显式调用 `/autopilot`、`/ralph`、`/ultrawork`、`omc ...`，或明确要求使用 OMC runtime 时，runtime 工作流才会启动。
 
 ### 不确定从哪里开始？
 
@@ -167,7 +167,7 @@ Team 按阶段化流水线运行：
 
 ### 开发者体验
 
-- **魔法关键词** - `ralph`、`ulw`、`plan` 提供显式控制
+- **魔法关键词** - 非 runtime 工作流关键词仍可自动路由；`ralph`、`autopilot`、`ultrawork` 等 runtime 工作流需要显式调用
 - **HUD 状态栏** - 状态栏实时显示编排指标
   - 如果你直接使用 `claude --plugin-dir <path>` 启动 Claude Code（绕过 `omc` shim），请在 shell 中导出 `OMC_PLUGIN_ROOT=<path>`，以便 HUD bundle 解析到与插件加载器相同的 checkout。详情见 [REFERENCE.md 中的 Plugin directory flags 部分](./docs/REFERENCE.md#plugin-directory-flags)。
 
@@ -219,9 +219,9 @@ source: extracted
 | `team` | 标准 Team 编排 | `/team 3:executor "fix all TypeScript errors"` |
 | `omc-teams` | tmux CLI 工作者 (codex/gemini/claude) | `/omc-teams 2:codex "security review"` |
 | `ccg` | 三模型 Codex+Gemini 编排 | `/ccg review this PR` |
-| `autopilot` | 全自动执行 | `autopilot: build a todo app` |
-| `ralph` | 持久模式 | `ralph: refactor auth` |
-| `ulw` | 最大并行化 | `ulw fix all errors` |
+| `/autopilot` | 全自动执行 | `/autopilot "build a todo app"` |
+| `/ralph` | 持久模式 | `/ralph "refactor auth"` |
+| `/ulw` | 最大并行化 | `/ultrawork "fix all errors"` |
 | `plan` | 规划访谈 | `plan the API` |
 | `ralplan` | 迭代规划共识 | `ralplan this feature` |
 | `deep-interview` | 苏格拉底式需求澄清 | `deep-interview "vague idea"` |
@@ -229,7 +229,8 @@ source: extracted
 | `ultrapilot` | **已弃用** — 请使用 `team` | `ultrapilot: build a fullstack app` |
 
 **注意：**
-- **ralph 包含 ultrawork：** 激活 ralph 模式时，会自动包含 ultrawork 的并行执行。无需组合关键词。
+- **ralph 包含 ultrawork：** 显式激活 ralph runtime 后，会自动包含 ultrawork 的并行执行。
+- `quick`、`standard`、`deep` 默认都走 direct。`deep` 本身不会自动启动 OMC。
 - `swarm N agents` 语法仍可被识别用于提取智能体数量，但运行时在 v4.1.7+ 中由 Team 支持。
 
 ---

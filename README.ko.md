@@ -38,10 +38,10 @@
 
 **Step 3: 무언가 만들기**
 ```
-autopilot: build a REST API for managing tasks
+/autopilot "build a REST API for managing tasks"
 ```
 
-끝입니다. 나머지는 모두 자동입니다.
+끝입니다. 기본 경로는 여전히 direct 실행이며, `/autopilot`, `/ralph`, `/ultrawork`, `omc ...`를 명시적으로 호출하거나 OMC runtime 사용을 명시적으로 요청할 때만 runtime 워크플로가 시작됩니다.
 
 ### 어디서 시작해야 할지 모르겠다면?
 
@@ -171,7 +171,7 @@ omc team shutdown auth-review
 
 ### 개발자 경험
 
-- **매직 키워드** - 명시적 제어를 위한 `ralph`, `ulw`, `team`
+- **매직 키워드** - non-runtime 워크플로 키워드는 계속 자동 라우팅될 수 있지만, `ralph`, `autopilot`, `ultrawork` 같은 runtime 워크플로는 명시적 호출이 필요합니다
 - **HUD 상태바** - 상태바에서 실시간 오케스트레이션 메트릭 확인
   - Claude Code를 `claude --plugin-dir <path>`로 직접 시작하는 경우 (OMC shim 우회), shell에서 `OMC_PLUGIN_ROOT=<path>`를 내보내 HUD 번들이 plugin 로더와 동일한 checkout으로 확인되도록 하세요. 자세한 내용은 [REFERENCE.md의 Plugin directory flags 섹션](./docs/REFERENCE.md#plugin-directory-flags)을 참조하세요.
 
@@ -223,9 +223,9 @@ server.py:42의 핸들러를 try/except ClientDisconnectedError로 감싸세요.
 | `team` | 표준 Team 오케스트레이션 | `/team 3:executor "fix all TypeScript errors"` |
 | `omc team` | tmux CLI 워커 (codex/gemini/claude) | `omc team 2:codex "security review"` |
 | `ccg` | 트라이-모델 Codex+Gemini 오케스트레이션 | `/ccg review this PR` |
-| `autopilot` | 완전 자율 실행 | `autopilot: build a todo app` |
-| `ralph` | 지속 모드 | `ralph: refactor auth` |
-| `ulw` | 최대 병렬화 | `ulw fix all errors` |
+| `/autopilot` | 완전 자율 실행 | `/autopilot "build a todo app"` |
+| `/ralph` | 지속 모드 | `/ralph "refactor auth"` |
+| `/ulw` | 최대 병렬화 | `/ultrawork "fix all errors"` |
 | `plan` | 계획 인터뷰 | `plan the API` |
 | `ralplan` | 반복적 계획 합의 | `ralplan this feature` |
 | `deep-interview` | 소크라테스식 요구사항 명확화 | `deep-interview "vague idea"` |
@@ -406,3 +406,4 @@ Oh-My-ClaudeCode가 당신의 워크플로우에 도움이 된다면, 후원을 
 - 🐛 버그 리포트
 - 💡 기능 제안
 - 📝 코드 기여
+- `quick`, `standard`, `deep`는 모두 기본적으로 direct 실행을 사용합니다. `deep` 분류만으로 OMC가 자동 시작되지는 않습니다.

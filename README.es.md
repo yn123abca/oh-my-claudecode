@@ -38,10 +38,10 @@ Si ejecuta OMC mediante `omc --plugin-dir <path>` o `claude --plugin-dir <path>`
 
 **Paso 3: Construye algo**
 ```
-autopilot: build a REST API for managing tasks
+/autopilot "build a REST API for managing tasks"
 ```
 
-Eso es todo. Todo lo demás es automático.
+Eso es todo. La ruta por defecto sigue siendo ejecución directa; los workflows de runtime solo se inician cuando invocas explícitamente `/autopilot`, `/ralph`, `/ultrawork`, `omc ...` o pides explícitamente usar el runtime de OMC.
 
 ### ¿No sabes por dónde empezar?
 
@@ -167,7 +167,7 @@ Múltiples estrategias para diferentes casos de uso - desde construcciones compl
 
 ### Experiencia de Desarrollo
 
-- **Palabras clave mágicas** - `ralph`, `ulw`, `plan` para control explícito
+- **Palabras clave mágicas** - las palabras clave de workflows no-runtime aún pueden enrutar automáticamente; los workflows de runtime como `ralph`, `autopilot` y `ultrawork` requieren invocación explícita
 - **Barra de estado HUD** - Métricas de orquestación en tiempo real en tu barra de estado
 - **Aprendizaje de habilidades** - Extrae patrones reutilizables de tus sesiones
 - **Análisis y seguimiento de costos** - Comprende el uso de tokens en todas las sesiones
@@ -210,9 +210,9 @@ Atajos opcionales para usuarios avanzados. El lenguaje natural funciona bien sin
 | `team` | Orquestación canónica con Team | `/team 3:executor "fix all TypeScript errors"` |
 | `omc-teams` | Trabajadores CLI tmux (codex/gemini/claude) | `/omc-teams 2:codex "security review"` |
 | `ccg` | Orquestación tri-modelo Codex+Gemini | `/ccg review this PR` |
-| `autopilot` | Ejecución completamente autónoma | `autopilot: build a todo app` |
-| `ralph` | Modo persistencia | `ralph: refactor auth` |
-| `ulw` | Máximo paralelismo | `ulw fix all errors` |
+| `/autopilot` | Ejecución completamente autónoma | `/autopilot "build a todo app"` |
+| `/ralph` | Modo persistencia | `/ralph "refactor auth"` |
+| `/ulw` | Máximo paralelismo | `/ultrawork "fix all errors"` |
 | `plan` | Entrevista de planificación | `plan the API` |
 | `ralplan` | Consenso de planificación iterativa | `ralplan this feature` |
 | `deep-interview` | Clarificación socrática de requisitos | `deep-interview "vague idea"` |
@@ -220,7 +220,8 @@ Atajos opcionales para usuarios avanzados. El lenguaje natural funciona bien sin
 | `ultrapilot` | **Obsoleto** — usa `team` en su lugar | `ultrapilot: build a fullstack app` |
 
 **Notas:**
-- **ralph incluye ultrawork:** Cuando activas el modo ralph, automáticamente incluye la ejecución paralela de ultrawork. No es necesario combinar palabras clave.
+- **ralph incluye ultrawork:** Cuando activas explícitamente el runtime de ralph, automáticamente incluye la ejecución paralela de ultrawork.
+- `quick`, `standard` y `deep` usan ejecución directa por defecto. La clasificación `deep` no inicia OMC automáticamente.
 - La sintaxis `swarm N agents` aún se reconoce para extraer el recuento de agentes, pero el runtime está respaldado por Team en v4.1.7+.
 
 ---
