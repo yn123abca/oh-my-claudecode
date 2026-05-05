@@ -153,6 +153,10 @@ function isExplicitRalplanSlashInvocation(prompt) {
   return /^\s*\/(?:oh-my-claudecode:)?ralplan(?:\s|$)/i.test(prompt);
 }
 
+function isExplicitWorkflowSlashInvocation(prompt) {
+  return /^\s*\/(?:(?:oh-my-claudecode|omc):)?(?:deep-interview|ralplan|ralph|autopilot|ultrawork)(?:\s|$)/i.test(prompt);
+}
+
 function isExplicitAskSlashInvocation(prompt) {
   return /^\s*\/(?:oh-my-claudecode:)?ask\s+(?:claude|codex|gemini)\b/i.test(prompt);
 }
@@ -1015,30 +1019,22 @@ async function main() {
       matches.push({ name: 'cancel', args: '' });
     }
 
+    const explicitWorkflowSlash = isExplicitWorkflowSlashInvocation(prompt);
+
     // Ralph keywords
-    if (hasActionableKeyword(cleanPrompt, /\b(ralph|don't stop|must complete|until done)\b|(랄프)(?!로렌)/i)) {
+    if (explicitWorkflowSlash && hasActionableKeyword(cleanPrompt, /\b(ralph)\b|(랄프)(?!로렌)/i)) {
       matches.push({ name: 'ralph', args: '' });
     }
 
     // Autopilot keywords
-    // "autonomous" intentionally excluded — it is too common in technical and
-    // research prose (e.g. "autonomous driving", "autonomous agent") to be a
-    // reliable trigger. Aligns with src/hooks/keyword-detector/index.ts and
-    // templates/hooks/keyword-detector.mjs, which already exclude it.
-    if (hasActionableKeyword(cleanPrompt, /\b(autopilot|auto pilot|auto-pilot|full auto|fullsend)\b|(오토파일럿)/i) ||
-        hasActionableKeyword(cleanPrompt, /\b(build|create|make)\s+me\s+(an?\s+)?(app|feature|project|tool|plugin|website|api|server|cli|script|system|service|dashboard|bot|extension)\b/i) ||
-        hasActionableKeyword(cleanPrompt, /\bi\s+want\s+a\s+/i) ||
-        hasActionableKeyword(cleanPrompt, /\bi\s+want\s+an\s+/i) ||
-        hasActionableKeyword(cleanPrompt, /\bhandle\s+it\s+all\b/i) ||
-        hasActionableKeyword(cleanPrompt, /\bend\s+to\s+end\b/i) ||
-        hasActionableKeyword(cleanPrompt, /\be2e\s+this\b/i)) {
+    if (explicitWorkflowSlash && hasActionableKeyword(cleanPrompt, /\b(autopilot|auto pilot|auto-pilot|full auto|fullsend)\b|(오토파일럿)/i)) {
       matches.push({ name: 'autopilot', args: '' });
     }
 
     // Ultrapilot keywords removed — routed to team which is now explicit-only (/team).
 
     // Ultrawork keywords
-    if (hasActionableKeyword(cleanPrompt, /\b(ultrawork|ulw|uw)\b|(울트라워크)/i)) {
+    if (explicitWorkflowSlash && hasActionableKeyword(cleanPrompt, /\b(ultrawork|ulw|uw)\b|(울트라워크)/i)) {
       matches.push({ name: 'ultrawork', args: '' });
     }
 
@@ -1058,7 +1054,7 @@ async function main() {
     }
 
     // Deep interview keywords
-    if (hasActionableKeyword(cleanPrompt, /\b(deep[\s-]interview|ouroboros)\b|(딥인터뷰)/i)) {
+    if (explicitWorkflowSlash && hasActionableKeyword(cleanPrompt, /\b(deep[\s-]interview|ouroboros)\b|(딥인터뷰)/i)) {
       matches.push({ name: 'deep-interview', args: '' });
     }
 

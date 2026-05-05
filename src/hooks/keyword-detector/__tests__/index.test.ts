@@ -283,11 +283,11 @@ Final draft.`);
 
   describe('detectKeywordsWithType', () => {
     describe('ralph keyword', () => {
-      it('should detect ralph keyword', () => {
-        const result = detectKeywordsWithType('Please ralph this task');
+      it('should detect explicit slash ralph keyword', () => {
+        const result = detectKeywordsWithType('/ralph this task');
         const ralphMatch = result.find((r) => r.type === 'ralph');
         expect(ralphMatch).toBeDefined();
-        expect(ralphMatch?.keyword).toBe('ralph');
+        expect(ralphMatch?.keyword).toBe('/ralph');
       });
 
       it('should NOT detect informational Korean questions about ralph and ralplan', () => {
@@ -313,8 +313,8 @@ Final draft.`);
         expect(detectKeywordsWithType("What's autopilot and how to use it?")).toEqual([]);
       });
 
-      it('should detect explicit activation even when a nearby help question exists', () => {
-        const result = detectKeywordsWithType('Use autopilot to fix bug in payments. What is the expected output?');
+      it('should detect explicit slash activation even when a nearby help question exists', () => {
+        const result = detectKeywordsWithType('/autopilot fix bug in payments. What is the expected output?');
         expect(result.find((r) => r.type === 'autopilot')).toBeDefined();
       });
 
@@ -346,13 +346,12 @@ Final draft.`);
         expect(detectKeywordsWithType('오토파일럿이 랄프랑 뭐가 달라')).toHaveLength(0);
       });
 
-      it('Korean imperative command with 기능/방법 SHOULD trigger keyword (not filtered)', () => {
-        // "기능 켜줘" / "기능으로 진행해줘" — 기능 alone without a question verb is NOT informational
+      it('Korean imperative command without explicit slash stays on the direct path', () => {
         const autopilotResult = detectKeywordsWithType('오토파일럿 기능 켜고 버그 고쳐줘');
-        expect(autopilotResult.find((r) => r.type === 'autopilot')).toBeDefined();
+        expect(autopilotResult.find((r) => r.type === 'autopilot')).toBeUndefined();
 
         const ralphResult = detectKeywordsWithType('랄프 기능으로 끝까지 진행해줘');
-        expect(ralphResult.find((r) => r.type === 'ralph')).toBeDefined();
+        expect(ralphResult.find((r) => r.type === 'ralph')).toBeUndefined();
       });
 
       it('should NOT detect diagnostic mentions of keywords as activation requests', () => {
@@ -362,17 +361,17 @@ Final draft.`);
         expect(detectKeywordsWithType('ralph-loop이 자꾸 재실행되는 문제가 있어. 점검해줘')).toEqual([]);
       });
 
-      it('should still detect explicit activation requests that mention bug/issue context', () => {
-        const autopilot = detectKeywordsWithType('use autopilot to fix bug in payments');
+      it('should still detect explicit slash activation requests that mention bug/issue context', () => {
+        const autopilot = detectKeywordsWithType('/autopilot fix bug in payments');
         expect(autopilot.find((r) => r.type === 'autopilot')).toBeDefined();
 
-        const ralph = detectKeywordsWithType('run ralph on issue in parser module');
+        const ralph = detectKeywordsWithType('/ralph run on issue in parser module');
         expect(ralph.find((r) => r.type === 'ralph')).toBeDefined();
 
-        const autopilotIssue = detectKeywordsWithType('fix issue with autopilot in parser module');
+        const autopilotIssue = detectKeywordsWithType('/autopilot fix issue in parser module');
         expect(autopilotIssue.find((r) => r.type === 'autopilot')).toBeDefined();
 
-        const ralphProblem = detectKeywordsWithType('investigate problem with ralph state');
+        const ralphProblem = detectKeywordsWithType('/ralph investigate problem with state');
         expect(ralphProblem.find((r) => r.type === 'ralph')).toBeDefined();
       });
 
@@ -396,34 +395,34 @@ Final draft.`);
     });
 
     describe('autopilot keyword', () => {
-      it('should detect autopilot keyword', () => {
-        const result = detectKeywordsWithType('Run in autopilot mode');
+      it('should detect explicit slash autopilot keyword', () => {
+        const result = detectKeywordsWithType('/autopilot mode');
         const autopilotMatch = result.find((r) => r.type === 'autopilot');
         expect(autopilotMatch).toBeDefined();
       });
 
-      it('should detect "auto pilot" with space', () => {
+      it('should not detect "auto pilot" with space without explicit slash', () => {
         const result = detectKeywordsWithType('Enable auto pilot');
         const autopilotMatch = result.find((r) => r.type === 'autopilot');
-        expect(autopilotMatch).toBeDefined();
+        expect(autopilotMatch).toBeUndefined();
       });
 
-      it('should detect "auto-pilot" with hyphen', () => {
+      it('should not detect "auto-pilot" with hyphen without explicit slash', () => {
         const result = detectKeywordsWithType('Enable auto-pilot mode');
         const autopilotMatch = result.find((r) => r.type === 'autopilot');
-        expect(autopilotMatch).toBeDefined();
+        expect(autopilotMatch).toBeUndefined();
       });
 
-      it('should detect "full auto" keyword', () => {
+      it('should not detect "full auto" keyword without explicit slash', () => {
         const result = detectKeywordsWithType('Go full auto on this');
         const autopilotMatch = result.find((r) => r.type === 'autopilot');
-        expect(autopilotMatch).toBeDefined();
+        expect(autopilotMatch).toBeUndefined();
       });
 
-      it('should detect "fullsend" keyword', () => {
+      it('should not detect "fullsend" keyword without explicit slash', () => {
         const result = detectKeywordsWithType('fullsend this implementation');
         const autopilotMatch = result.find((r) => r.type === 'autopilot');
-        expect(autopilotMatch).toBeDefined();
+        expect(autopilotMatch).toBeUndefined();
       });
 
       it('should NOT detect "build me" phrase', () => {
@@ -440,16 +439,16 @@ Final draft.`);
     });
 
     describe('ultrawork keyword', () => {
-      it('should detect ultrawork keyword', () => {
-        const result = detectKeywordsWithType('Do ultrawork on this');
+      it('should detect explicit slash ultrawork keyword', () => {
+        const result = detectKeywordsWithType('/ultrawork on this');
         const ultraworkMatch = result.find((r) => r.type === 'ultrawork');
         expect(ultraworkMatch).toBeDefined();
       });
 
-      it('should detect ulw abbreviation', () => {
+      it('should not detect ulw abbreviation without explicit slash', () => {
         const result = detectKeywordsWithType('ulw this code');
         const ultraworkMatch = result.find((r) => r.type === 'ultrawork');
-        expect(ultraworkMatch).toBeDefined();
+        expect(ultraworkMatch).toBeUndefined();
       });
 
       it('should NOT detect uw abbreviation', () => {
@@ -2041,16 +2040,16 @@ This article argues that fake popularity signals damage trust in open source.`;
         expect(getAllKeywords('랄프 코드리뷰')).toEqual(['ralph', 'code-review']);
       });
 
-      it('getPrimaryKeyword("오토파일럿")?.type should be "autopilot"', () => {
-        expect(getPrimaryKeyword('오토파일럿')?.type).toBe('autopilot');
+      it('getPrimaryKeyword("오토파일럿") stays undefined without explicit slash', () => {
+        expect(getPrimaryKeyword('오토파일럿')).toBeUndefined();
       });
 
-      it('hasKeyword("울트라워크") should be true', () => {
-        expect(hasKeyword('울트라워크')).toBe(true);
+      it('hasKeyword("울트라워크") should be false without explicit slash', () => {
+        expect(hasKeyword('울트라워크')).toBe(false);
       });
 
-      it('hasKeyword("오토파일럿") should be true', () => {
-        expect(hasKeyword('오토파일럿')).toBe(true);
+      it('hasKeyword("오토파일럿") should be false without explicit slash', () => {
+        expect(hasKeyword('오토파일럿')).toBe(false);
       });
     });
   });

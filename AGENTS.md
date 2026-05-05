@@ -15,12 +15,12 @@ Required schema sections and this template's mapping:
 - **Recovery & Lifecycle Overlays**: runtime/team overlays are appended by marker-bounded runtime hooks.
 
 Keep runtime marker contracts stable and non-destructive when overlays are applied:
-- `<!-- OMX:RUNTIME:START --> ... <!-- OMX:RUNTIME:END -->`
-- `<!-- OMX:TEAM:WORKER:START --> ... <!-- OMX:TEAM:WORKER:END -->`
+- `<!-- OMC:RUNTIME:START --> ... <!-- OMC:RUNTIME:END -->`
+- `<!-- OMC:TEAM:WORKER:START --> ... <!-- OMC:TEAM:WORKER:END -->`
 </guidance_schema_contract>
 
 <operating_principles>
-- Delegate specialized or tool-heavy work to the most appropriate agent.
+- Solve directly when safe; delegate specialized or tool-heavy work only when it improves quality, speed, or correctness.
 - Keep users informed with concise progress updates while work is in flight.
 - Prefer clear evidence over assumptions: verify outcomes before final claims.
 - Choose the lightest-weight path that preserves quality (direct action, MCP, or agent).
@@ -44,16 +44,29 @@ Keep runtime marker contracts stable and non-destructive when overlays are appli
 - Final reports must include changed files, simplifications made, and remaining risks.
 </working_agreements>
 
+## Language Defaults
+
+- Default user-facing input and output language is Simplified Chinese (`zh-CN`) unless the user explicitly requests another language.
+- Keep code, identifiers, paths, commands, logs, quoted source text, and error messages in their original form unless translation is explicitly requested.
+
+## Workspace Defaults
+
+- Claude project parent: Linux/WSL `~/ai/claude`; Windows `%USERPROFILE%\ai\claude`.
+- Codex project parent for cross-runtime work: Linux/WSL `~/ai/codex`; Windows `%USERPROFILE%\ai\codex`.
+- Put each project under the runtime-specific parent as `<project>`.
+- `.claude` is configuration/runtime home; project `tasks/`, `tmp/`, `output/`, and `.omc/` state belong in the owning project directory.
+
 ---
 
 <delegation_rules>
-Use delegation when it improves quality, speed, or correctness:
+Default posture: work directly.
+
+Use delegation when it materially improves quality, speed, or correctness:
 - Multi-file implementations, refactors, debugging, reviews, planning, research, and verification.
 - Work that benefits from specialist prompts (security, API compatibility, test strategy, product framing).
 - Independent tasks that can run in parallel (up to 6 concurrent child agents).
 
-Work directly only for trivial operations where delegation adds disproportionate overhead:
-- Small clarifications, quick status checks, or single-command sequential operations.
+Work directly for trivial operations, bounded quick tasks, small clarifications, status checks, and single-command sequential operations.
 
 For substantive code changes, delegate to `executor` (default for both standard and complex implementation work).
 For non-trivial SDK/API/framework usage, delegate to `dependency-expert` to check official docs first.
@@ -65,7 +78,7 @@ To inject role-specific behavior, the parent MUST read the role prompt and pass 
 
 Delegation steps:
 1. Decide which agent role to delegate to (e.g., `architect`, `executor`, `debugger`)
-2. Read the role prompt: `~/.codex/prompts/{role}.md`
+2. Read the role prompt from this plugin: `agents/{role}.md`
 3. Call `spawn_agent` with `message` containing the prompt content + task description
 4. The child agent receives full role context and executes the task independently
 
@@ -77,7 +90,7 @@ spawn_agent(message: "<test-engineer prompt>\n\nTask: Write tests for the auth c
 ```
 
 Each child agent:
-- Receives its role-specific prompt (from ~/.codex/prompts/)
+- Receives its role-specific prompt from this plugin's `agents/` directory
 - Inherits AGENTS.md context (via child_agents_md feature flag)
 - Runs in an isolated context with its own tool access
 - Returns results to the parent when complete
@@ -91,12 +104,12 @@ Key constraints:
 
 <invocation_conventions>
 Claude Code uses these prefixes for custom commands:
-- `/prompts:name` — invoke a custom prompt (e.g., `/prompts:architect "review auth module"`)
+- `/oh-my-claudecode:name` — invoke a custom command (e.g., `/oh-my-claudecode:architect "review auth module"`)
 - `$name` — invoke a skill (e.g., `$ralph "fix all tests"`, `$autopilot "build REST API"`)
 - `/skills` — browse available skills interactively
 
-Agent prompts (in `~/.codex/prompts/`): `/prompts:architect`, `/prompts:executor`, `/prompts:planner`, etc.
-Workflow skills (in `~/.agents/skills/`): `$ralph`, `$autopilot`, `$plan`, `$ralplan`, `$team`, etc.
+Agent prompts live in this plugin's `agents/` directory and are injected into child-agent messages by the parent.
+Workflow skills: OMC-owned skills live in this plugin's `skills/` directory; portable public skills live in `~/.claude/skills -> ~/skill/views/claude`.
 </invocation_conventions>
 
 <model_routing>
@@ -105,7 +118,7 @@ Match agent role to task complexity:
 - **Standard** (implementation, debugging, reviews): `executor`, `debugger`, `test-engineer`
 - **High complexity** (architecture, deep analysis, complex refactors): `architect`, `executor`, `critic`
 
-For interactive use: `/prompts:name` (e.g., `/prompts:architect "review auth"`)
+For interactive use: `/oh-my-claudecode:name` (e.g., `/oh-my-claudecode:architect "review auth"`)
 For child agent delegation: follow `<child_agent_protocol>` — read prompt file, pass it in `spawn_agent.message`
 For workflow skills: `$name` (e.g., `$ralph "fix all tests"`)
 </model_routing>
@@ -113,71 +126,73 @@ For workflow skills: `$name` (e.g., `$ralph "fix all tests"`)
 ---
 
 <agent_catalog>
-Use `/prompts:name` to invoke specialized agents (Claude Code custom prompt syntax).
+Use `/oh-my-claudecode:name` to invoke specialized agents (Claude Code custom prompt syntax).
 
 Build/Analysis Lane:
-- `/prompts:explore`: Fast codebase search, file/symbol mapping
-- `/prompts:analyst`: Requirements clarity, acceptance criteria, hidden constraints
-- `/prompts:planner`: Task sequencing, execution plans, risk flags
-- `/prompts:architect`: System design, boundaries, interfaces, long-horizon tradeoffs
-- `/prompts:debugger`: Root-cause analysis, regression isolation, failure diagnosis
-- `/prompts:executor`: Code implementation, refactoring, feature work
-- `/prompts:verifier`: Completion evidence, claim validation, test adequacy
+- `/oh-my-claudecode:explore`: Fast codebase search, file/symbol mapping
+- `/oh-my-claudecode:analyst`: Requirements clarity, acceptance criteria, hidden constraints
+- `/oh-my-claudecode:planner`: Task sequencing, execution plans, risk flags
+- `/oh-my-claudecode:architect`: System design, boundaries, interfaces, long-horizon tradeoffs
+- `/oh-my-claudecode:debugger`: Root-cause analysis, regression isolation, failure diagnosis
+- `/oh-my-claudecode:executor`: Code implementation, refactoring, feature work
+- `/oh-my-claudecode:verifier`: Completion evidence, claim validation, test adequacy
 
 Review Lane:
-- `/prompts:style-reviewer`: Formatting, naming, idioms, lint conventions
-- `/prompts:code-reviewer`: Comprehensive review — logic defects, maintainability, anti-patterns, style, performance
-- `/prompts:api-reviewer`: API contracts, versioning, backward compatibility
-- `/prompts:security-reviewer`: Vulnerabilities, trust boundaries, authn/authz
-- `/prompts:performance-reviewer`: Hotspots, complexity, memory/latency optimization
+- `/oh-my-claudecode:style-reviewer`: Formatting, naming, idioms, lint conventions
+- `/oh-my-claudecode:code-reviewer`: Comprehensive review — logic defects, maintainability, anti-patterns, style, performance
+- `/oh-my-claudecode:api-reviewer`: API contracts, versioning, backward compatibility
+- `/oh-my-claudecode:security-reviewer`: Vulnerabilities, trust boundaries, authn/authz
+- `/oh-my-claudecode:performance-reviewer`: Hotspots, complexity, memory/latency optimization
 
 Domain Specialists:
-- `/prompts:dependency-expert`: External SDK/API/package evaluation
-- `/prompts:test-engineer`: Test strategy, coverage, flaky-test hardening
-- `/prompts:quality-strategist`: Quality strategy, release readiness, risk assessment
-- `/prompts:debugger`: Build/toolchain/type failures, root-cause analysis
-- `/prompts:designer`: UX/UI architecture, interaction design
-- `/prompts:writer`: Docs, migration notes, user guidance
-- `/prompts:qa-tester`: Interactive CLI/service runtime validation
-- `/prompts:git-master`: Commit strategy, history hygiene
-- `/prompts:researcher`: External documentation and reference research
+- `/oh-my-claudecode:dependency-expert`: External SDK/API/package evaluation
+- `/oh-my-claudecode:test-engineer`: Test strategy, coverage, flaky-test hardening
+- `/oh-my-claudecode:quality-strategist`: Quality strategy, release readiness, risk assessment
+- `/oh-my-claudecode:debugger`: Build/toolchain/type failures, root-cause analysis
+- `/oh-my-claudecode:designer`: UX/UI architecture, interaction design
+- `/oh-my-claudecode:writer`: Docs, migration notes, user guidance
+- `/oh-my-claudecode:qa-tester`: Interactive CLI/service runtime validation
+- `/oh-my-claudecode:git-master`: Commit strategy, history hygiene
+- `/oh-my-claudecode:researcher`: External documentation and reference research
 
 Product Lane:
-- `/prompts:product-manager`: Problem framing, personas/JTBD, PRDs
-- `/prompts:ux-researcher`: Heuristic audits, usability, accessibility
-- `/prompts:information-architect`: Taxonomy, navigation, findability
-- `/prompts:product-analyst`: Product metrics, funnel analysis, experiments
+- `/oh-my-claudecode:product-manager`: Problem framing, personas/JTBD, PRDs
+- `/oh-my-claudecode:ux-researcher`: Heuristic audits, usability, accessibility
+- `/oh-my-claudecode:information-architect`: Taxonomy, navigation, findability
+- `/oh-my-claudecode:product-analyst`: Product metrics, funnel analysis, experiments
 
 Coordination:
-- `/prompts:critic`: Plan/design critical challenge
-- `/prompts:vision`: Image/screenshot/diagram analysis
+- `/oh-my-claudecode:critic`: Plan/design critical challenge
+- `/oh-my-claudecode:vision`: Image/screenshot/diagram analysis
 </agent_catalog>
 
 ---
 
 <keyword_detection>
-When the user's message contains a magic keyword, activate the corresponding skill IMMEDIATELY.
+When the user's message contains a specific workflow keyword, activate the corresponding skill immediately.
 Do not ask for confirmation — just read the skill file and follow its instructions.
 
 | Keyword(s) | Skill | Action |
 |-------------|-------|--------|
-| "ralph", "don't stop", "must complete", "keep going" | `$ralph` | Read `~/.agents/skills/ralph/SKILL.md`, execute persistence loop |
-| "autopilot", "build me", "I want a" | `$autopilot` | Read `~/.agents/skills/autopilot/SKILL.md`, execute autonomous pipeline |
-| "ultrawork", "ulw", "parallel" | `$ultrawork` | Read `~/.agents/skills/ultrawork/SKILL.md`, execute parallel agents |
-| "plan this", "plan the", "let's plan" | `$plan` | Read `~/.agents/skills/plan/SKILL.md`, start planning workflow |
-| "interview", "deep interview", "gather requirements", "interview me", "don't assume", "ouroboros" | `$deep-interview` | Read `~/.agents/skills/deep-interview/SKILL.md`, run Ouroboros-inspired Socratic ambiguity-gated interview workflow |
-| "ralplan", "consensus plan" | `$ralplan` | Read `~/.agents/skills/ralplan/SKILL.md`, start consensus planning with RALPLAN-DR structured deliberation (short by default, `--deliberate` for high-risk) |
-| "ecomode", "eco", "budget" | `$ecomode` | Read `~/.agents/skills/ecomode/SKILL.md`, enable token-efficient mode |
-| "cancel", "stop", "abort" | `$cancel` | Read `~/.agents/skills/cancel/SKILL.md`, cancel active modes |
+| "ralph", "don't stop", "must complete", "keep going" | `$ralph` | Read `skills/ralph/SKILL.md`, execute persistence loop |
+| "autopilot", "auto pilot", "full auto", "handle it all" | `$autopilot` | Read `skills/autopilot/SKILL.md`, execute autonomous pipeline |
+| "ultrawork", "ulw", "parallel agents", "run in parallel", "maximum parallelism" | `$ultrawork` | Read `skills/ultrawork/SKILL.md`, execute parallel agents |
+| "interview", "deep interview", "gather requirements", "interview me", "don't assume", "ouroboros" | `$deep-interview` | Read `skills/deep-interview/SKILL.md`, run Ouroboros-inspired Socratic ambiguity-gated interview workflow |
+| "ralplan", "consensus plan" | `$ralplan` | Read `skills/ralplan/SKILL.md`, start consensus planning with RALPLAN-DR structured deliberation (short by default, `--deliberate` for high-risk) |
+| "ecomode", "eco", "budget" | `$ultrawork` | Use OMC lightweight routing / `skills/ultrawork/SKILL.md`; no separate `ecomode` skill is installed |
+| "cancelomc", "stopomc", "stop now", "abort task" | `$cancel` | Read `skills/cancel/SKILL.md`, cancel active modes |
 | "tdd", "test first" | keyword mode | Inject TDD-mode guidance and favor test-first execution with `test-engineer` when appropriate |
-| "cleanup", "deslop", "anti-slop" | `$ai-slop-cleaner` | Read `~/.agents/skills/ai-slop-cleaner/SKILL.md`, plan and clean AI-generated slop with separate writer/reviewer passes |
-| "web-clone", "clone site", "clone website", "copy webpage" | `$web-clone` | Read `~/.agents/skills/web-clone/SKILL.md`, start website cloning pipeline |
+| "cleanup", "deslop", "anti-slop" | `$ai-slop-cleaner` | Read `skills/ai-slop-cleaner/SKILL.md`, plan and clean AI-generated slop with separate writer/reviewer passes |
 
 Detection rules:
 - Keywords are case-insensitive and match anywhere in the user's message
 - If multiple keywords match, use the most specific (longest match)
 - Conflict resolution: explicit `$name` invocation overrides keyword detection
 - The rest of the user's message (after keyword extraction) becomes the task description
+- Do not activate workflows from generic words when they appear as ordinary task content, quoted text, code, or object names.
+- `plan this` / `plan the` are intentionally not automatic triggers; use `ralplan` or explicit `/oh-my-claudecode:omc-plan`.
+- Team mode is explicit: use `/team` in-session or `omc team` from the shell rather than a bare `team` keyword.
+- Cancellation language only activates `$cancel` when the user is clearly commanding the current OMC runtime to stop or abort.
 
 Ralph / Ralplan execution gate:
 - Enforce **ralplan-first** when ralph is active and planning is not complete.
@@ -195,8 +210,8 @@ Workflow Skills:
 - `ralph`: Self-referential persistence loop with verification
 - `ultrawork`: Maximum parallelism with parallel agent orchestration
 - `visual-verdict`: Structured visual QA verdict loop for screenshot/reference comparisons
-- `web-clone`: URL-driven website cloning with visual + functional verification
-- `ecomode`: Token-efficient execution using lightweight models
+- `web-clone`: Not installed in the default OMC/shared Claude view; use only when a project-local or shared skill is explicitly installed
+- `ecomode`: Compatibility trigger routed to lightweight OMC/ultrawork execution; no separate installed skill
 - `team`: N coordinated agents on shared task list
 - `ultraqa`: QA cycling -- test, verify, fix, repeat
 - `plan`: Strategic planning with optional RALPLAN-DR consensus mode
@@ -268,7 +283,7 @@ Resume: detect existing team state and resume from the last incomplete stage.
 ---
 
 <team_model_resolution>
-Team/Swarm worker startup currently uses one shared `agentType` and one shared launch-arg set for all workers in a team run.
+Team worker startup currently uses one shared `agentType` and one shared launch-arg set for all workers in a team run.
 
 For Claude worker model selection, apply this precedence (highest to lowest):
 1. Explicit `--model` already present in worker launch args
@@ -332,7 +347,7 @@ Use the `cancel` skill to end execution modes. This clears state files and stops
 When to cancel:
 - All tasks are done and verified: invoke cancel.
 - Work is blocked and cannot proceed: explain the blocker, then invoke cancel.
-- User says "stop": invoke cancel immediately.
+- User says `stopomc`, `stop now`, or clearly asks to stop the current OMC mode: invoke cancel immediately.
 
 When not to cancel:
 - Work is still incomplete: continue working.
@@ -382,7 +397,7 @@ Recommended mode fields:
 - `autopilot`: `active`, `current_phase` (`expansion|planning|execution|qa|validation|complete`), `started_at`, `completed_at`
 - `ultrawork`: `active`, `reinforcement_count`, `started_at`
 - `team`: `active`, `current_phase` (`team-plan|team-prd|team-exec|team-verify|team-fix|complete`), `agent_count`, `team_name`
-- `ecomode`: `active`
+- `ecomode`: no dedicated state entry; record under `ultrawork` or the active lightweight execution mode
 - `ultraqa`: `active`, `current_phase`, `iteration`, `started_at`, `completed_at`
 </state_management>
 

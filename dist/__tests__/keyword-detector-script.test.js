@@ -287,15 +287,25 @@ diff --git a/a b/b
         expect(context).not.toContain('[MAGIC KEYWORD: AUTOPILOT]');
         expect(existsSync(autopilotStatePath)).toBe(false);
     });
-    it('still activates autopilot for an explicit autopilot invocation (positive control)', () => {
+    it('still activates autopilot for an explicit slash autopilot invocation (positive control)', () => {
         const cwd = mkdtempSync(join(tmpdir(), 'keyword-detector-autopilot-positive-'));
         const sessionId = 'session-autopilot-positive';
-        const output = runKeywordDetector('autopilot build a todo CLI', cwd, sessionId);
+        const output = runKeywordDetector('/autopilot build a todo CLI', cwd, sessionId);
         const context = output.hookSpecificOutput?.additionalContext ?? '';
         const autopilotStatePath = join(cwd, '.omc', 'state', 'sessions', sessionId, 'autopilot-state.json');
         expect(output.continue).toBe(true);
         expect(context).toContain('[MAGIC KEYWORD: AUTOPILOT]');
         expect(existsSync(autopilotStatePath)).toBe(true);
+    });
+    it('keeps implicit autopilot-style phrasing on the direct path', () => {
+        const cwd = mkdtempSync(join(tmpdir(), 'keyword-detector-autopilot-implicit-'));
+        const sessionId = 'session-autopilot-implicit';
+        const output = runKeywordDetector('build me a todo CLI end to end', cwd, sessionId);
+        const context = output.hookSpecificOutput?.additionalContext ?? '';
+        const autopilotStatePath = join(cwd, '.omc', 'state', 'sessions', sessionId, 'autopilot-state.json');
+        expect(output.continue).toBe(true);
+        expect(context).toBe('');
+        expect(existsSync(autopilotStatePath)).toBe(false);
     });
 });
 //# sourceMappingURL=keyword-detector-script.test.js.map

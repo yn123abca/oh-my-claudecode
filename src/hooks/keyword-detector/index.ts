@@ -624,6 +624,12 @@ export function detectKeywordsWithType(
   }
 
   const cleanedText = sanitizeForKeywordDetection(text);
+  const explicitWorkflowTypes = new Set<KeywordType>([
+    'ralph',
+    'autopilot',
+    'ultrawork',
+    'deep-interview',
+  ]);
 
   // Check each keyword type
   for (const type of KEYWORD_PRIORITY) {
@@ -635,6 +641,10 @@ export function detectKeywordsWithType(
     // Skip the type that the explicit-slash detector already surfaced so we
     // do not emit duplicate entries for the same intent.
     if (explicitSlashType && type === explicitSlashType) {
+      continue;
+    }
+
+    if (explicitWorkflowTypes.has(type) && !explicitSlashType) {
       continue;
     }
 
