@@ -217,7 +217,7 @@ Saves agent activity, token usage, and other session data to `.omc/sessions/`. I
 Detects magic keywords in user prompts and invokes the corresponding skill.
 
 - **Event**: UserPromptSubmit
-- **Behavior**: Sanitizes the prompt (removes code blocks, URLs, file paths) then matches keyword patterns
+- **Behavior**: Sanitizes the prompt (removes code blocks, URLs, file paths) then matches keyword patterns. Runtime workflows are gated and require explicit runtime invocation context.
 - **Conflict resolution**: cancel has highest priority, then ralph > autopilot > ultrawork
 - **Safety**: Disabled inside team workers to prevent infinite spawning
 
@@ -234,7 +234,7 @@ Enforces continuation when an execution mode is active. This is the hook that ke
 - **Notification**: Sends Discord/Telegram/Slack notification on first stop (if configured)
 - **Cancel**: Use `/oh-my-claudecode:cancel` to deactivate modes
 
-> **Note**: autopilot, ralph, ultrawork, and ultraqa are **skills** (invoked via keyword-detector), not hooks. The persistent-mode hook is what enforces their continuation by blocking the Stop event.
+> **Note**: autopilot, ralph, ultrawork, and ultraqa are runtime skills. They are not started from task class alone or from bare runtime keywords; they require explicit `/...` invocation or explicit `omc` runtime intent. The persistent-mode hook enforces continuation only after those runtime skills are actually activated.
 
 ### Mode State Management
 
@@ -339,7 +339,7 @@ Session Start
 
 ## Magic Keywords
 
-Magic keywords automatically activate OMC skills or execution modes when specific words or patterns are detected in the user's natural language prompt. No slash command is needed — include a keyword in your prompt and the feature activates automatically.
+Magic keywords can activate OMC skills when specific words or patterns are detected in the user's natural language prompt. Runtime execution modes are stricter: they do not start from task class alone or from bare runtime keywords.
 
 ### How keyword-detector Works
 
@@ -349,6 +349,7 @@ Magic keywords automatically activate OMC skills or execution modes when specifi
 2. Removes code blocks, XML tags, URLs, and file paths to prevent false positives
 3. Matches keyword patterns against the sanitized text
 4. Resolves conflicts, then injects the skill invocation instruction
+5. For runtime workflows, requires explicit `/...` invocation or explicit `omc` runtime intent before activation
 
 **Safety measures:**
 
@@ -363,9 +364,9 @@ These keywords invoke a skill and create a state file.
 | Keyword | Skill | Description |
 |---------|-------|-------------|
 | `cancelomc`, `stopomc` | cancel | Cancels all active modes |
-| `ralph`, `don't stop`, `must complete`, `until done` | ralph | Persistent execution until verification completes |
-| `autopilot`, `build me`, `I want a`, `handle it all`, `end to end`, `auto-pilot`, `full auto`, `fullsend`, `e2e this` | autopilot | Fully autonomous execution |
-| `ultrawork`, `ulw`, `uw` | ultrawork | Maximum parallel execution |
+| `ralph`, `don't stop`, `must complete`, `until done` | ralph | Runtime-only; requires explicit `/ralph` or explicit `omc` runtime intent |
+| `autopilot`, `build me`, `I want a`, `handle it all`, `end to end`, `auto-pilot`, `full auto`, `fullsend`, `e2e this` | autopilot | Runtime-only; requires explicit `/autopilot` or explicit `omc` runtime intent |
+| `ultrawork`, `ulw`, `uw` | ultrawork | Runtime-only; requires explicit `/ultrawork` or explicit `omc` runtime intent |
 | `ccg`, `claude-codex-gemini` | ccg | Claude-Codex-Gemini tri-model orchestration |
 | `ralplan` | ralplan | Consensus-based iterative planning |
 | `deep interview`, `ouroboros` | deep-interview | Socratic deep interview |

@@ -640,7 +640,7 @@ OMC registers 20 hook scripts across 11 Claude Code lifecycle events. For detail
 | **Stop** | `context-guard-stop.mjs`, `persistent-mode.cjs`, `code-simplifier.mjs` | 5s, 10s, 5s |
 | **SessionEnd** | `session-end.mjs` | 30s |
 
-> **Note**: autopilot, ralph, ultrawork, and ultraqa are **skills** (activated via keyword-detector), not hooks. The `persistent-mode.cjs` hook enforces their continuation by blocking the Stop event.
+> **Note**: autopilot, ralph, ultrawork, and ultraqa are runtime skills, not hooks. They are activated only by explicit runtime invocation (`/...`, `/oh-my-claudecode:...`, `omc ...`, or explicit OMC runtime intent). The `persistent-mode.cjs` hook enforces continuation only after activation.
 
 ### Code Simplifier Hook
 

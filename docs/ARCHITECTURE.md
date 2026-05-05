@@ -363,7 +363,7 @@ Injected pattern meanings:
 
 ### Key Hooks
 
-**keyword-detector** — fires on `UserPromptSubmit`. Detects magic keywords in user input and activates the corresponding skill.
+**keyword-detector** — fires on `UserPromptSubmit`. Detects magic keywords in user input and activates the corresponding skill. Runtime skills additionally require explicit runtime invocation context and must not start from task class alone or from bare runtime keywords.
 
 **persistent-mode** — fires on `Stop`. When a persistent mode (ralph, ultrawork) is active, prevents Claude from stopping until work is verified complete.
 

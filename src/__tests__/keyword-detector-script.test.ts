@@ -379,10 +379,22 @@ diff --git a/a b/b
     expect(existsSync(autopilotStatePath)).toBe(false);
   });
 
-  it('still activates autopilot for an explicit autopilot invocation (positive control)', () => {
+  it('does not activate autopilot for bare autopilot text without explicit OMC runtime invocation', () => {
     const cwd = mkdtempSync(join(tmpdir(), 'keyword-detector-autopilot-positive-'));
     const sessionId = 'session-autopilot-positive';
     const output = runKeywordDetector('autopilot build a todo CLI', cwd, sessionId);
+    const context = output.hookSpecificOutput?.additionalContext ?? '';
+    const autopilotStatePath = join(cwd, '.omc', 'state', 'sessions', sessionId, 'autopilot-state.json');
+
+    expect(output.continue).toBe(true);
+    expect(context).not.toContain('[MAGIC KEYWORD: AUTOPILOT]');
+    expect(existsSync(autopilotStatePath)).toBe(false);
+  });
+
+  it('still activates autopilot for an explicit slash invocation (positive control)', () => {
+    const cwd = mkdtempSync(join(tmpdir(), 'keyword-detector-autopilot-explicit-'));
+    const sessionId = 'session-autopilot-explicit';
+    const output = runKeywordDetector('/autopilot build a todo CLI', cwd, sessionId);
     const context = output.hookSpecificOutput?.additionalContext ?? '';
     const autopilotStatePath = join(cwd, '.omc', 'state', 'sessions', sessionId, 'autopilot-state.json');
 

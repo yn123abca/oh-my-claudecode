@@ -157,6 +157,14 @@ function isExplicitWorkflowSlashInvocation(prompt) {
   return /^\s*\/(?:(?:oh-my-claudecode|omc):)?(?:deep-interview|ralplan|ralph|autopilot|ultrawork)(?:\s|$)/i.test(prompt);
 }
 
+function isExplicitOmcRuntimeInvocation(prompt) {
+  return /\bomc\s+(?:team|ralph|autopilot|ultrawork|deep-interview|ralplan)\b/i.test(prompt)
+    || /\b(?:run|start|use|enable|launch|invoke|activate)\s+omc\b/i.test(prompt)
+    || /\buse\s+omc\s+runtime\b/i.test(prompt)
+    || /\buse\s+the\s+omc\s+runtime\b/i.test(prompt)
+    || /\bcall\s+omc\b/i.test(prompt);
+}
+
 function isExplicitAskSlashInvocation(prompt) {
   return /^\s*\/(?:oh-my-claudecode:)?ask\s+(?:claude|codex|gemini)\b/i.test(prompt);
 }
@@ -1020,21 +1028,23 @@ async function main() {
     }
 
     const explicitWorkflowSlash = isExplicitWorkflowSlashInvocation(prompt);
+    const explicitOmcRuntime = isExplicitOmcRuntimeInvocation(prompt);
+    const explicitRuntimeInvocation = explicitWorkflowSlash || explicitOmcRuntime;
 
     // Ralph keywords
-    if (explicitWorkflowSlash && hasActionableKeyword(cleanPrompt, /\b(ralph)\b|(랄프)(?!로렌)/i)) {
+    if (explicitRuntimeInvocation && hasActionableKeyword(cleanPrompt, /\b(ralph)\b|(랄프)(?!로렌)/i)) {
       matches.push({ name: 'ralph', args: '' });
     }
 
     // Autopilot keywords
-    if (explicitWorkflowSlash && hasActionableKeyword(cleanPrompt, /\b(autopilot|auto pilot|auto-pilot|full auto|fullsend)\b|(오토파일럿)/i)) {
+    if (explicitRuntimeInvocation && hasActionableKeyword(cleanPrompt, /\b(autopilot|auto pilot|auto-pilot|full auto|fullsend)\b|(오토파일럿)/i)) {
       matches.push({ name: 'autopilot', args: '' });
     }
 
     // Ultrapilot keywords removed — routed to team which is now explicit-only (/team).
 
     // Ultrawork keywords
-    if (explicitWorkflowSlash && hasActionableKeyword(cleanPrompt, /\b(ultrawork|ulw|uw)\b|(울트라워크)/i)) {
+    if (explicitRuntimeInvocation && hasActionableKeyword(cleanPrompt, /\b(ultrawork|ulw|uw)\b|(울트라워크)/i)) {
       matches.push({ name: 'ultrawork', args: '' });
     }
 
@@ -1054,7 +1064,7 @@ async function main() {
     }
 
     // Deep interview keywords
-    if (explicitWorkflowSlash && hasActionableKeyword(cleanPrompt, /\b(deep[\s-]interview|ouroboros)\b|(딥인터뷰)/i)) {
+    if (explicitRuntimeInvocation && hasActionableKeyword(cleanPrompt, /\b(deep[\s-]interview|ouroboros)\b|(딥인터뷰)/i)) {
       matches.push({ name: 'deep-interview', args: '' });
     }
 

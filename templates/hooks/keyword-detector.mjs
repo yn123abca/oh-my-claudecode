@@ -148,6 +148,18 @@ function isExplicitAskSlashInvocation(prompt) {
   return /^\s*\/(?:oh-my-claudecode:)?ask\s+(?:claude|codex|gemini)\b/i.test(prompt);
 }
 
+function isExplicitWorkflowSlashInvocation(prompt) {
+  return /^\s*\/(?:(?:oh-my-claudecode|omc):)?(?:deep-interview|ralplan|ralph|autopilot|ultrawork)(?:\s|$)/i.test(prompt);
+}
+
+function isExplicitOmcRuntimeInvocation(prompt) {
+  return /\bomc\s+(?:team|ralph|autopilot|ultrawork|deep-interview|ralplan)\b/i.test(prompt)
+    || /\b(?:run|start|use|enable|launch|invoke|activate)\s+omc\b/i.test(prompt)
+    || /\buse\s+omc\s+runtime\b/i.test(prompt)
+    || /\buse\s+the\s+omc\s+runtime\b/i.test(prompt)
+    || /\bcall\s+omc\b/i.test(prompt);
+}
+
 // Sanitize text to prevent false positives from code blocks, XML tags, URLs, and file paths
 const ANTI_SLOP_EXPLICIT_PATTERN = /\b(ai[\s-]?slop|anti[\s-]?slop|deslop|de[\s-]?slop)\b/i;
 const ANTI_SLOP_ACTION_PATTERN = /\b(clean(?:\s*up)?|cleanup|refactor|simplify|dedupe|de-duplicate|prune)\b/i;
@@ -911,6 +923,9 @@ async function main() {
     }
 
     const cleanPrompt = sanitizeForKeywordDetection(prompt).toLowerCase();
+    const explicitWorkflowSlash = isExplicitWorkflowSlashInvocation(prompt);
+    const explicitOmcRuntime = isExplicitOmcRuntimeInvocation(prompt);
+    const explicitRuntimeInvocation = explicitWorkflowSlash || explicitOmcRuntime;
 
     // Collect all matching keywords
     const matches = [];
@@ -921,12 +936,12 @@ async function main() {
     }
 
     // Ralph keywords
-    if (hasActionableKeyword(cleanPrompt, /\b(ralph)\b|(랄프)(?!로렌)/i)) {
+    if (explicitRuntimeInvocation && hasActionableKeyword(cleanPrompt, /\b(ralph)\b|(랄프)(?!로렌)/i)) {
       matches.push({ name: 'ralph', args: '' });
     }
 
     // Autopilot keywords
-    if (hasActionableKeyword(cleanPrompt, /\b(autopilot|auto[\s-]?pilot|fullsend|full\s+auto)\b|(오토파일럿)/i)) {
+    if (explicitRuntimeInvocation && hasActionableKeyword(cleanPrompt, /\b(autopilot|auto[\s-]?pilot|fullsend|full\s+auto)\b|(오토파일럿)/i)) {
       matches.push({ name: 'autopilot', args: '' });
     }
 
@@ -934,7 +949,7 @@ async function main() {
     // This prevents infinite spawning when Claude workers receive prompts containing "team".
 
     // Ultrawork keywords
-    if (hasActionableKeyword(cleanPrompt, /\b(ultrawork|ulw)\b|(울트라워크)/i)) {
+    if (explicitRuntimeInvocation && hasActionableKeyword(cleanPrompt, /\b(ultrawork|ulw)\b|(울트라워크)/i)) {
       matches.push({ name: 'ultrawork', args: '' });
     }
 
@@ -950,7 +965,7 @@ async function main() {
     }
 
     // Deep interview keywords
-    if (hasActionableKeyword(cleanPrompt, /\b(deep[\s-]interview|ouroboros)\b|(딥인터뷰)/i)) {
+    if (explicitRuntimeInvocation && hasActionableKeyword(cleanPrompt, /\b(deep[\s-]interview|ouroboros)\b|(딥인터뷰)/i)) {
       matches.push({ name: 'deep-interview', args: '' });
     }
 

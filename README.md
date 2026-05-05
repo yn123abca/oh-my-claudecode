@@ -262,7 +262,7 @@ Multiple strategies for different use cases — from Team-backed orchestration t
 
 ### Developer Experience
 
-- **Magic keywords** - `ralph`, `ulw`, `ralplan`; Team stays explicit via `/team`
+- **Magic keywords** - non-runtime workflow keywords still route automatically; runtime workflows such as `ralph`, `autopilot`, and `ultrawork` now require explicit `/...` invocation or explicit `omc` runtime intent. Team stays explicit via `/team`
 - **HUD statusline** - Real-time orchestration metrics in your status bar
   - If you launch Claude Code directly with `claude --plugin-dir <path>` (bypassing the `omc` shim), export `OMC_PLUGIN_ROOT=<path>` in your shell so the HUD bundle resolves to the same checkout as the plugin loader. See the [Plugin directory flags section in REFERENCE.md](./docs/REFERENCE.md#plugin-directory-flags) for details.
 - **Skill learning** - Extract reusable patterns from your sessions
@@ -311,9 +311,9 @@ These shortcuts run **inside a Claude Code / OMC session**, not as terminal CLI 
 | ---------------------- | --------------------- | ----------------------------------- | ---------------------------------------------- |
 | `/team`                | Slash skill           | Canonical Team orchestration        | `/team 3:executor "fix all TypeScript errors"` |
 | `/ccg`                 | Slash skill           | `/ask codex` + `/ask gemini` synthesis | `/ccg review this PR`                       |
-| `/autopilot` / `autopilot` | Skill / prompt trigger | Full autonomous execution       | `/autopilot "build a todo app"`                |
-| `/ralph` / `ralph`     | Skill / prompt trigger | Persistence mode                   | `/ralph "refactor auth"`                       |
-| `/ultrawork` / `ulw`   | Skill / prompt trigger | Maximum parallelism                | `/ultrawork "fix all errors"`                  |
+| `/autopilot` | Slash/runtime invocation | Full autonomous execution       | `/autopilot "build a todo app"`                |
+| `/ralph`     | Slash/runtime invocation | Persistence mode                   | `/ralph "refactor auth"`                       |
+| `/ultrawork` | Slash/runtime invocation | Maximum parallelism                | `/ultrawork "fix all errors"`                  |
 | `/ralplan` / `ralplan` | Skill / prompt trigger | Iterative planning consensus       | `/ralplan "plan this feature"`                 |
 | `/deep-interview`      | Slash skill           | Socratic requirements clarification | `/deep-interview "vague idea"`                 |
 | `deepsearch`           | Prompt trigger        | Codebase-focused search routing     | `deepsearch for auth middleware`               |
@@ -325,6 +325,8 @@ These shortcuts run **inside a Claude Code / OMC session**, not as terminal CLI 
 - **ralph includes ultrawork**: when you activate ralph mode, it automatically includes ultrawork's parallel execution.
 - `swarm` compatibility alias has been removed; migrate existing prompts to `/team` syntax.
 - `plan this` / `plan the` keyword triggers were removed; use `ralplan` or explicit `/oh-my-claudecode:omc-plan`.
+- quick, standard, and deep all default to direct execution. Deep classification alone does not start OMC.
+- Runtime workflows start only when you explicitly invoke `/...`, `/oh-my-claudecode:...`, `omc ...`, or otherwise explicitly ask to use OMC runtime.
 
 ## Utilities
 

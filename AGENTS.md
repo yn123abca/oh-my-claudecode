@@ -169,14 +169,15 @@ Coordination:
 ---
 
 <keyword_detection>
-When the user's message contains a specific workflow keyword, activate the corresponding skill immediately.
+When the user's message contains a specific workflow keyword, activate the corresponding skill immediately only for non-runtime workflows.
 Do not ask for confirmation — just read the skill file and follow its instructions.
+Runtime workflows must not start from task class alone or from bare runtime keywords.
 
 | Keyword(s) | Skill | Action |
 |-------------|-------|--------|
-| "ralph", "don't stop", "must complete", "keep going" | `$ralph` | Read `skills/ralph/SKILL.md`, execute persistence loop |
-| "autopilot", "auto pilot", "full auto", "handle it all" | `$autopilot` | Read `skills/autopilot/SKILL.md`, execute autonomous pipeline |
-| "ultrawork", "ulw", "parallel agents", "run in parallel", "maximum parallelism" | `$ultrawork` | Read `skills/ultrawork/SKILL.md`, execute parallel agents |
+| "ralph", "don't stop", "must complete", "keep going" | `$ralph` | Runtime-only: activate only when the user explicitly invokes `/ralph`, `/oh-my-claudecode:ralph`, `omc ...`, or explicitly asks to use OMC runtime |
+| "autopilot", "auto pilot", "full auto", "handle it all" | `$autopilot` | Runtime-only: activate only when the user explicitly invokes `/autopilot`, `/oh-my-claudecode:autopilot`, `omc ...`, or explicitly asks to use OMC runtime |
+| "ultrawork", "ulw", "parallel agents", "run in parallel", "maximum parallelism" | `$ultrawork` | Runtime-only: activate only when the user explicitly invokes `/ultrawork`, `/oh-my-claudecode:ultrawork`, `omc ...`, or explicitly asks to use OMC runtime |
 | "interview", "deep interview", "gather requirements", "interview me", "don't assume", "ouroboros" | `$deep-interview` | Read `skills/deep-interview/SKILL.md`, run Ouroboros-inspired Socratic ambiguity-gated interview workflow |
 | "ralplan", "consensus plan" | `$ralplan` | Read `skills/ralplan/SKILL.md`, start consensus planning with RALPLAN-DR structured deliberation (short by default, `--deliberate` for high-risk) |
 | "ecomode", "eco", "budget" | `$ultrawork` | Use OMC lightweight routing / `skills/ultrawork/SKILL.md`; no separate `ecomode` skill is installed |
@@ -192,6 +193,7 @@ Detection rules:
 - Do not activate workflows from generic words when they appear as ordinary task content, quoted text, code, or object names.
 - `plan this` / `plan the` are intentionally not automatic triggers; use `ralplan` or explicit `/oh-my-claudecode:omc-plan`.
 - Team mode is explicit: use `/team` in-session or `omc team` from the shell rather than a bare `team` keyword.
+- Runtime keywords alone do not start OMC. Quick, standard, and deep all default to direct execution unless the user explicitly asks to call `omc` or to use OMC runtime.
 - Cancellation language only activates `$cancel` when the user is clearly commanding the current OMC runtime to stop or abort.
 
 Ralph / Ralplan execution gate:
