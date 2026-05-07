@@ -19,6 +19,25 @@
 import { join, basename } from 'path';
 import { createHash } from 'crypto';
 import { pathToFileURL } from 'url';
+import { homedir } from 'os';
+import { existsSync, realpathSync } from 'fs';
+
+function normalizePathForCompare(path) {
+  try {
+    return realpathSync(path);
+  } catch {
+    return path;
+  }
+}
+
+function isSharedAiRoot(directory) {
+  const normalized = normalizePathForCompare(directory);
+  const sharedAiRoot = normalizePathForCompare(join(homedir(), 'ai'));
+  if (normalized === sharedAiRoot) {
+    return true;
+  }
+  return basename(normalized) === 'ai' && existsSync(join(normalized, 'task'));
+}
 
 /**
  * Resolve the .omc root directory, respecting OMC_STATE_DIR.
@@ -27,13 +46,14 @@ import { pathToFileURL } from 'url';
  * @returns {Promise<string>} Absolute path to the .omc root
  */
 export async function resolveOmcStateRoot(directory) {
+  const effectiveDirectory = isSharedAiRoot(directory) ? process.cwd() : directory;
   const pluginRoot = process.env.CLAUDE_PLUGIN_ROOT;
   if (pluginRoot) {
     try {
       const { getOmcRoot } = await import(
         pathToFileURL(join(pluginRoot, 'dist', 'lib', 'worktree-paths.js')).href
       );
-      return getOmcRoot(directory);
+      return getOmcRoot(effectiveDirectory);
     } catch {
       // dist not built or unavailable — fall through to inline fallback
     }
@@ -42,9 +62,9 @@ export async function resolveOmcStateRoot(directory) {
   // Inline fallback: respects OMC_STATE_DIR with simplified project identifier
   const customDir = process.env.OMC_STATE_DIR;
   if (customDir) {
-    const hash = createHash('sha256').update(directory).digest('hex').slice(0, 16);
-    const dirName = basename(directory).replace(/[^a-zA-Z0-9_-]/g, '_');
+    const hash = createHash('sha256').update(effectiveDirectory).digest('hex').slice(0, 16);
+    const dirName = basename(effectiveDirectory).replace(/[^a-zA-Z0-9_-]/g, '_');
     return join(customDir, `${dirName}-${hash}`);
   }
-  return join(directory, '.omc');
+  return join(effectiveDirectory, '.omc');
 }

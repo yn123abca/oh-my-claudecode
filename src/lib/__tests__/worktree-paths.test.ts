@@ -25,6 +25,7 @@ import {
   getWorktreeRoot,
   getProjectIdentifier,
   clearDualDirWarnings,
+  isSharedAiRoot,
 } from '../worktree-paths.js';
 
 const TEST_DIR = '/tmp/worktree-paths-test';
@@ -111,6 +112,14 @@ describe('worktree-paths', () => {
     it('getOmcRoot returns correct path', () => {
       const result = getOmcRoot(TEST_DIR);
       expect(result).toBe(join(TEST_DIR, '.omc'));
+    });
+
+    it('does not treat ~/ai shared root as a valid .omc host root', () => {
+      const sharedAiRoot = join(process.env.HOME || '/home/xilinx', 'ai');
+      const taskDir = join(sharedAiRoot, 'task', 'maintain');
+      expect(isSharedAiRoot(sharedAiRoot)).toBe(true);
+      expect(getOmcRoot(sharedAiRoot)).toBe(join(process.cwd(), '.omc'));
+      expect(getOmcRoot(taskDir)).toBe(join(taskDir, '.omc'));
     });
 
     it('resolvePlanPath returns correct path', () => {

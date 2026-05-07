@@ -108,6 +108,23 @@ export function validatePath(inputPath: string): void {
 /** Track which dual-dir warnings have been logged to avoid repeated warnings */
 const dualDirWarnings = new Set<string>();
 
+function normalizePathForCompare(path: string): string {
+  try {
+    return realpathSync(path);
+  } catch {
+    return resolve(path);
+  }
+}
+
+export function isSharedAiRoot(directory: string): boolean {
+  const normalized = normalizePathForCompare(directory);
+  const sharedAiRoot = normalizePathForCompare(join(homedir(), 'ai'));
+  if (normalized === sharedAiRoot) {
+    return true;
+  }
+  return basename(normalized) === 'ai' && existsSync(join(normalized, 'task'));
+}
+
 /**
  * Clear the dual-directory warning cache (useful for testing).
  * @internal
@@ -192,13 +209,14 @@ export function getProjectIdentifier(worktreeRoot?: string): string {
  */
 export function getOmcRoot(worktreeRoot?: string): string {
   const customDir = process.env.OMC_STATE_DIR;
+  const root = worktreeRoot || getWorktreeRoot() || process.cwd();
+  const effectiveRoot = isSharedAiRoot(root) ? process.cwd() : root;
   if (customDir) {
-    const root = worktreeRoot || getWorktreeRoot() || process.cwd();
-    const projectId = getProjectIdentifier(root);
+    const projectId = getProjectIdentifier(effectiveRoot);
     const centralizedPath = join(customDir, projectId);
 
     // Log notice if both legacy .omc/ and new centralized dir exist
-    const legacyPath = join(root, OmcPaths.ROOT);
+    const legacyPath = join(effectiveRoot, OmcPaths.ROOT);
     const warningKey = `${legacyPath}:${centralizedPath}`;
     if (!dualDirWarnings.has(warningKey) && existsSync(legacyPath) && existsSync(centralizedPath)) {
       dualDirWarnings.add(warningKey);
@@ -210,8 +228,7 @@ export function getOmcRoot(worktreeRoot?: string): string {
 
     return centralizedPath;
   }
-  const root = worktreeRoot || getWorktreeRoot() || process.cwd();
-  return join(root, OmcPaths.ROOT);
+  return join(effectiveRoot, OmcPaths.ROOT);
 }
 
 /**
