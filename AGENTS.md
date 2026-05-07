@@ -51,8 +51,8 @@ Keep runtime marker contracts stable and non-destructive when overlays are appli
 
 ## Workspace Defaults
 
-- Claude project parent: Linux/WSL `~/ai/claude`; Windows `%USERPROFILE%\ai\claude`.
-- Codex project parent for cross-runtime work: Linux/WSL `~/ai/codex`; Windows `%USERPROFILE%\ai\codex`.
+- Claude project parent: Linux/WSL `~/ai/runtime/claude`; Windows `%USERPROFILE%\ai\runtime\claude`.
+- Codex project parent for cross-runtime work: Linux/WSL `~/ai/runtime/codex`; Windows `%USERPROFILE%\ai\runtime\codex`.
 - Put each project under the runtime-specific parent as `<project>`.
 - `.claude` is configuration/runtime home; project `tasks/`, `tmp/`, `output/`, and `.omc/` state belong in the owning project directory.
 

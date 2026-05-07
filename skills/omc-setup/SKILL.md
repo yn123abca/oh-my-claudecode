@@ -60,10 +60,11 @@ MODES:
     - Use this to update project config after OMC upgrades
 
   Global Configuration (--global)
-    - Downloads fresh CLAUDE.md to ~/.claude/
+    - Downloads fresh OMC CLAUDE content for ~/.claude/
     - Backs up existing CLAUDE.md to ~/.claude/CLAUDE.md.backup.YYYY-MM-DD
     - Default: explicitly overwrites ~/.claude/CLAUDE.md so plain `claude` also uses OMC
     - Optional preserve mode keeps the user's base `CLAUDE.md` and installs OMC into `CLAUDE-omc.md` for `omc` launches
+    - If ~/.claude/CLAUDE.md is a generated local-entry bridge, setup auto-falls back to preserve mode and keeps the bridge intact
     - Applies to all Claude Code sessions
     - Cleans up legacy hooks
     - Use this to update global config after OMC upgrades
@@ -119,6 +120,7 @@ Use AskUserQuestion to prompt:
 - Detect if local (.claude/CLAUDE.md) or global (~/.claude/CLAUDE.md) config exists
 - If local exists, run: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/setup-claude-md.sh" local`
 - If only global exists, run: `bash "${CLAUDE_PLUGIN_ROOT}/scripts/setup-claude-md.sh" global`
+- If global `~/.claude/CLAUDE.md` is a generated local-entry bridge, expect the script to preserve that bridge and update companion OMC content instead
 - Skip all other steps
 - Report success and exit
 

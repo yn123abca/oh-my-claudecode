@@ -25,6 +25,8 @@ If `CONFIG_TARGET=global` and `~/.claude/CLAUDE.md` already exists without OMC m
 
 Set `GLOBAL_INSTALL_STYLE=overwrite` or `preserve` based on the user's choice. If you did not ask this question, default `GLOBAL_INSTALL_STYLE=overwrite`.
 
+If `CONFIG_TARGET=global` and `~/.claude/CLAUDE.md` contains the generated local-entry marker used by a separate renderer, do not ask the overwrite/preserve question. The setup script will auto-fall back to preserve mode so the generated bridge stays intact.
+
 ## Download and Install CLAUDE.md
 
 **MANDATORY**: Always run this command. Do NOT skip. Do NOT use the Write tool. Let the setup script choose the safest canonical source (bundled `docs/CLAUDE.md` first, GitHub fallback only if needed).
@@ -33,7 +35,7 @@ Set `GLOBAL_INSTALL_STYLE=overwrite` or `preserve` based on the user's choice. I
 bash "${CLAUDE_PLUGIN_ROOT}/scripts/setup-claude-md.sh" <CONFIG_TARGET> [GLOBAL_INSTALL_STYLE]
 ```
 
-Replace `<CONFIG_TARGET>` with `local` or `global`. For local installs, omit the optional style argument. For global installs, pass `overwrite` or `preserve` when you know the user's choice; otherwise let the script default to `overwrite`.
+Replace `<CONFIG_TARGET>` with `local` or `global`. For local installs, omit the optional style argument. For global installs, pass `overwrite` or `preserve` when you know the user's choice; otherwise let the script default to `overwrite`. In generated local-entry environments, the script may silently switch the effective global mode to `preserve`.
 
 The script must install the canonical `docs/CLAUDE.md` content and preserve the required
 `<!-- OMC:START -->` / `<!-- OMC:END -->` markers. Do **not** hand-write, summarize, or
@@ -73,6 +75,7 @@ If `CONFIG_TARGET` is `global`:
 OMC Global Configuration Complete
 - CLAUDE.md: Updated at ~/.claude/CLAUDE.md, or preserved with explicit preserve mode
 - Companion: May install ~/.claude/CLAUDE-omc.md when preserve mode is chosen
+- Managed bridge note: If ~/.claude/CLAUDE.md is renderer-owned, preserve mode is selected automatically and the generated bridge remains unchanged
 - Backup: Previous CLAUDE.md backed up (if existed)
 - Scope: GLOBAL - applies to all Claude Code sessions
 - Hooks: Provided by plugin (no manual installation needed)

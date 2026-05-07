@@ -200,6 +200,27 @@ trap 'rm -f "$TEMP_OMC"' EXIT
 OMC_IMPORT_START='<!-- OMC:IMPORT:START -->'
 OMC_IMPORT_END='<!-- OMC:IMPORT:END -->'
 COMPANION_FILENAME='CLAUDE-omc.md'
+LOCAL_ENTRY_GENERATED_MARKER='<!-- generated:local-entrypoint -->'
+
+maybe_force_preserve_for_managed_local_entry() {
+  if [ "$MODE" != "global" ]; then
+    return 0
+  fi
+
+  if [ ! -f "$TARGET_PATH" ]; then
+    return 0
+  fi
+
+  if ! grep -Fq "$LOCAL_ENTRY_GENERATED_MARKER" "$TARGET_PATH"; then
+    return 0
+  fi
+
+  if [ "$INSTALL_STYLE" = "overwrite" ]; then
+    INSTALL_STYLE="preserve"
+    echo "Detected generated local-entry bridge at $TARGET_PATH; switching global OMC setup to preserve mode."
+    echo "OMC will write companion config to $CONFIG_DIR/$COMPANION_FILENAME and keep the generated bridge file intact."
+  fi
+}
 
 write_wrapped_omc_file() {
   local destination="$1"
@@ -245,6 +266,8 @@ ensure_not_symlink_path() {
 }
 
 VALIDATION_PATH="$TARGET_PATH"
+
+maybe_force_preserve_for_managed_local_entry
 
 SOURCE_LABEL=""
 if [ -f "$CANONICAL_CLAUDE_MD" ]; then

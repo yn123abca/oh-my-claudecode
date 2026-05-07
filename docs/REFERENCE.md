@@ -73,10 +73,11 @@ Configure omc for all Claude Code sessions:
 /oh-my-claudecode:omc-setup
 ```
 
-- Creates `~/.claude/CLAUDE.md` globally
+- Uses `~/.claude/CLAUDE.md` as the global Claude entrypoint
 - Configuration applies to all projects
 - **Default**: explicitly overwrites existing `~/.claude/CLAUDE.md`
 - **Optional preserve mode**: keeps the base file, writes OMC to `~/.claude/CLAUDE-omc.md`, and lets `omc` force-load that companion config at launch while plain `claude` stays unchanged
+- **Managed local-entry bridge mode**: if `~/.claude/CLAUDE.md` contains the generated local-entry marker used by a separate renderer, setup auto-falls back to preserve mode and keeps the generated bridge intact
 
 ### What Configuration Enables
 

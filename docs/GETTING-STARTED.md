@@ -112,6 +112,7 @@ Applies OMC to all Claude Code sessions:
 - Applied across all projects
 
 > ⚠️ **Warning:** Global setup now asks explicitly before changing your base `~/.claude/CLAUDE.md`. The default choice is still overwrite. If you choose preserve mode instead, plain `claude` stays on your base config and `omc` force-loads the OMC companion config.
+> ℹ️ **Managed local-entry environments:** if `~/.claude/CLAUDE.md` is a generated bridge file (for example rendered by `~/skill/scripts/render_local_entrypoints.py`), global setup auto-switches to preserve mode and writes OMC content to `~/.claude/CLAUDE-omc.md` instead of overwriting the generated bridge.
 
 ### Verifying the installation
 
@@ -409,9 +410,11 @@ OMC automatically selects a model tier based on task complexity:
 
 OMC's default behavior is also configured via `CLAUDE.md` files. Running `/oh-my-claudecode:omc-setup` generates this file automatically.
 
+If your machine uses a generated local-entry bridge model, the global `~/.claude/CLAUDE.md` file may be owned by a separate renderer. In that case OMC setup preserves the generated bridge and installs companion OMC content instead of replacing the bridge file.
+
 | Scope | File | Description |
 |-------|------|-------------|
-| Global | `~/.claude/CLAUDE.md` | Shared settings across all projects |
+| Global | `~/.claude/CLAUDE.md` | Shared Claude entrypoint across all projects; in managed local-entry environments this may stay a generated bridge while OMC config moves to a companion file |
 | Project | `.claude/CLAUDE.md` | Per-project context and overrides |
 
 ### When to re-run setup
